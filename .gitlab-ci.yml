@@ -1,16 +1,27 @@
-variables:
-  NewCodeRefBranch:
-    value: $CI_DEFAULT_BRANCH
-    description: "Define New code for feature branch"
+workflow:
+  rules:
+    # Prevent duplicate pipelines when pushing to a merge request
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    # When a merge request is created, use the target branch as the reference branch
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      variables:
+        NewCodeRefBranch: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+      when: always
+    # When a push event is detected, use the default branch as the reference branch
+    - if: $CI_PIPELINE_SOURCE == 'push'
+      variables:
+        NewCodeRefBranch: $CI_DEFAULT_BRANCH
+      when: always
 
 stages:
   - codecheck
 
 sonarqube:
   stage: codecheck
-  image: registry.syntecclub.com/projectroot/cnc/buildmachine/cncwindowsbuildmachine:winserver_ltsc2022-2.latest
+  image: 輸入可以編譯你軟體的image，並且要包含git與7z等工具
   tags:
-    - "docker_windows"
+    - "輸入gitlab有提供的windows環境的tag"
   variables:
     GIT_DEPTH: 0
   before_script:
