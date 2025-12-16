@@ -61,3 +61,19 @@ del /q /f %USERPROFILE%\build-wrapper-win-x86.zip
 del /q /f %USERPROFILE%\sonar-scanner-cli-%ScannerVersion%-windows-x64.zip
 rd /q /s %USERPROFILE%\build-wrapper-win-x86
 rd /q /s %USERPROFILE%\sonar-scanner-%ScannerVersion%-windows-x64
+
+REM check upload status (avoid scanning quality gate successfully but upload to server failed)
+echo.
+echo -check upload status
+setlocal enabledelayedexpansion
+for /f "tokens=*" %%i in ('findstr "ceTaskUrl" ..\.scannerwork\report-task.txt') do set TASK_URL=%%i
+set TASK_URL=!TASK_URL:~10!
+curl -u %SONAR_TOKEN%: %TASK_URL% 2>&1 | findstr "SUCCESS" >nul
+if %Errorlevel% EQU 0 (
+	set STATUS=SUCCESS
+	echo Upload Status : !STATUS!
+) else (
+	set STATUS=FAILED
+	echo Upload Status : !STATUS!
+	exit 1
+)
