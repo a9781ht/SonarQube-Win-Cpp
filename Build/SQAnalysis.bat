@@ -6,7 +6,7 @@ set ScannerVersion=6.1.0.4477
 REM download build-wrapper and scanner
 echo.
 echo -download build-wrapper
-curl -SL --output %USERPROFILE%\build-wrapper-win-x86.zip %SONAR_HOST_URL%/static/cpp/build-wrapper-win-x86.zip
+curl -SL --output %USERPROFILE%\build-wrapper-win-x86.zip %SONAR_HOST_URL%static/cpp/build-wrapper-win-x86.zip
 echo -download scanner
 curl -SL --output %USERPROFILE%\sonar-scanner-cli-%ScannerVersion%-windows-x64.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-%ScannerVersion%-windows-x64.zip
 

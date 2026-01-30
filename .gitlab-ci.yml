@@ -15,13 +15,33 @@ workflow:
       when: always
 
 stages:
-  - codecheck
+  - unit-test
+  - build-and-scan
 
-sonarqube:
-  stage: codecheck
-  image: è¼¸å…¥å¯ä»¥ç·¨è­¯ä½ è»Ÿé«”çš„imageï¼Œä¸¦ä¸”è¦åŒ…å«gitèˆ‡7zç­‰å·¥å…·
+test:
+  stage: unit-test
+  image: ¿é¤J¥i¥H½sÄ¶§A³nÅéªºimage
   tags:
-    - "è¼¸å…¥gitlabæœ‰æä¾›çš„windowsç’°å¢ƒçš„tag"
+    - "¿é¤Jgitlab¦³´£¨ÑªºwindowsÀô¹Òªºtag"
+  script:
+    - cd $CI_PROJECT_DIR\Build
+    - cmd /c "test.bat"
+  coverage: '/##teamcity\[buildStatisticValue key=''CodeCoverageS'' value=''(\d+\.?\d*)''\]/'
+  artifacts:
+    name: "BuildLog_UnitTest"
+    when: always
+    untracked: true
+    reports:
+      junit: "**/junit_test_results.xml"
+      coverage_report:
+        coverage_format: cobertura
+        path: "**/*.cobertura.xml"
+
+build:
+  stage: build-and-scan
+  image: ¿é¤J¥i¥H½sÄ¶§A³nÅéªºimage¡A¨Ã¥B­n¥]§tgit»P7zµ¥¤u¨ã
+  tags:
+    - "¿é¤Jgitlab¦³´£¨ÑªºwindowsÀô¹Òªºtag"
   variables:
     GIT_DEPTH: 0
   before_script:
@@ -30,7 +50,9 @@ sonarqube:
   script:
     - cd $CI_PROJECT_DIR\Build
     - cmd /c "SQAnalysis.bat"
+  needs:
+    - test
   artifacts:
-    name: "BuildLog_SonarQube"
+    name: "BuildLog_BuildAndScan"
     when: always
     untracked: true
